@@ -1,0 +1,24 @@
+{
+  "name": "jet-core",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "browser": "dist/index.umd.js",
+  "scripts": {
+    "start": "set NODE_ENV=dev&& node ./esbuild.js",
+    "build": "set NODE_ENV=prod&& node ./esbuild.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "chokidar": "^3.5.3",
+    "esbuild": "^0.14.27",
+    "eslint": "^8.11.0",
+    "fs-extra": "^10.0.1",
+    "live-server": "^1.2.1"
+  }
+}
