@@ -1,5 +1,5 @@
 {
-  "name": "jet-core",
+  "name": "simple-lib",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -11,14 +11,13 @@
     "build": "set NODE_ENV=prod&& node ./esbuild.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Jan Randa",
   "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
     "chokidar": "^3.5.3",
     "esbuild": "^0.14.27",
-    "eslint": "^8.11.0",
     "fs-extra": "^10.0.1",
     "live-server": "^1.2.1"
-  }
+  },
+  "devDependencies": {}
 }
