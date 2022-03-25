@@ -17,19 +17,34 @@ yarn add -D @randajan/simple-lib;
 ## Usage
 
 ```javascript
-    import slib from "@randajan/simple-lib";
+import slib from "./dist/index.js";
+import fs from "fs-extra"; // optional
 
-    //those values are default values
+//those values are default values
 
-    await slib({
-        start:false,                                                //true = start dev server; false = generate minify build;
-        port:3000,                                                  //port of dev server
-        distdir:"dist",                                             //directory of build
-        demodir:"demo",                                             //directory of demo
-        fetchVars:(async _=>await fse.readJSON("package.json")),    //function returning pairs of variables which were injected to demo/build/index.html
-        onRuntimeError:console.log                                  //function that handle dev server runtime errors
-    });
+slib({
+    start:true,                                                 //true = start dev server; false = generate minify build;
+    port:3000,                                                  //port of dev server
+    srcdir:"src",                                               //direrctory of source code
+    distdir:"dist",                                             //directory of build
+    demodir:"demo",                                             //directory of demo
+    fetchVars:(async _=>await fs.readJSON("package.json")),     //function returning pairs of variables which were injected to demo/build/index.html
+    onRuntimeError:console.log,                                 //function that handle dev server runtime errors
+    external:[]   
+})
 
 ```
+
+## Requirements
+
+```javascript
+...
+    "chokidar": "^3.5.3",
+    "esbuild": "^0.14.27",
+    "fs-extra": "^10.0.1",
+    "live-server": "^1.2.1"
+...
+```
+
 
 Happy hacking
