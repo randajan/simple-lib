@@ -1,5 +1,5 @@
 {
-  "name": "simple-lib",
+  "name": "@randajan/simple-lib",
   "version": "1.0.1",
   "description": "Supersimple start for developing custom js library",
   "type": "module",
