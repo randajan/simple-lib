@@ -2,6 +2,7 @@
   "name": "@randajan/simple-lib",
   "version": "1.0.2",
   "description": "Supersimple start for developing custom js library",
+  "repository": "randajan/simple-lib",
   "type": "module",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -9,8 +10,6 @@
     "build": "node ./build.js",
     "test": "node ./test.js"
   },
-  "keywords": [],
-  "author": "Jan Randa",
   "license": "MIT",
   "dependencies": {
     "chokidar": "^3.5.3",
@@ -18,5 +17,27 @@
     "fs-extra": "^10.0.1",
     "live-server": "^1.2.1"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "esbuild",
+    "library",
+    "boilerplate",
+    "simple",
+    "dev",
+    "live-server",
+    "chokidar"
+  ],
+  "homepage": "https://github.com/randajan/simple-lib",
+  "bugs": {
+    "url": "https://github.com/randajan/simple-lib/issues"
+  },
+  "author": {
+    "name": "Jan Randa",
+    "email": "jnranda@gmail.com",
+    "url": "https://www.linkedin.com/in/randajan/"
+  }
 }
