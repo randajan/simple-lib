@@ -1,6 +1,6 @@
 {
   "name": "simple-lib",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Supersimple start for developing custom js library",
   "type": "module",
   "main": "dist/index.cjs.js",
