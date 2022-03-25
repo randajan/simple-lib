@@ -4,7 +4,7 @@
   "description": "Supersimple start for developing custom js library",
   "repository": "randajan/simple-lib",
   "type": "module",
-  "main": "dist/index.cjs.js",
+  "main": "dist/index.js",
   "module": "dist/index.js",
   "scripts": {
     "build": "node ./build.js",

@@ -59,27 +59,17 @@ export default async (options={})=>{
     await fs.remove(distdir);
     await ensureFile(srcdir+"/index.js", `export default _=>console.log("helloworld");`);
 
-    const uni = {
-        color:true,
-        bundle:true,
-        sourcemap:true,
-        minify:!start,
-        entryPoints: [srcdir+"/index.js"],
-        external,
-    }
-
-    await build({
-        outfile: distdir+"/index.cjs.js",
-        format: 'cjs',
-        ...uni
-    });
-
     const dist = await build({
         outdir:distdir,
         splitting: true,
         format: 'esm',
         incremental:true,
-        ...uni
+        color:true,
+        bundle:true,
+        sourcemap:true,
+        minify:!start,
+        entryPoints: [srcdir+"/index.js"],
+        external
     });
 
     const resetDemo = async ()=>{
