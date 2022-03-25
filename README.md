@@ -1,5 +1,7 @@
 # Simple node.js lib
 
+[![NPM](https://img.shields.io/npm/v/@randajan/simple-lib.svg)](https://www.npmjs.com/package/@randajan/simple-lib) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 Goal is to provide supersimple start for developing custom js library.
 
 ## Instalation
@@ -48,3 +50,7 @@ slib({
 
 
 Happy hacking
+
+## License
+
+MIT © [randajan](https://github.com/randajan)
