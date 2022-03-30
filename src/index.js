@@ -21,11 +21,6 @@ const indexHTMLTemplate = `<!DOCTYPE html>
 
 </html>`;
 
-const ensureFile = async (path, template)=>{
-    if (fs.existsSync(path)) { return; }
-    await fs.outputFile(path, template);
-}
-
 const injectFile = async (file, vars={})=>{
     let s = String(await fs.readFile(file));
     for (let key of (new Set(s.match(/(?<=\{\{)[^\{\}]+(?=\}\})/g)))) {
@@ -42,6 +37,8 @@ export default async (options={})=>{
         srcdir,
         distdir,
         demodir,
+        entries,
+        plugins,
         fetchVars,
         onRuntimeError,
         external
@@ -52,13 +49,23 @@ export default async (options={})=>{
     srcdir = srcdir || "src";
     distdir = distdir || "dist";
     demodir = demodir || "demo";
+    entries = (entries || ["index.js"]).map(e=>srcdir+"/"+e);
+    plugins = plugins || [];
     fetchVars = fetchVars || (async _=>await fs.readJSON("package.json"));
     onRuntimeError = onRuntimeError || console.log;
     external = external || [];
 
-    await fs.remove(distdir);
-    await ensureFile(srcdir+"/index.js", `export default _=>console.log("helloworld");`);
+    if (!fs.existsSync(srcdir)) {
+        await fs.outputFile(srcdir+"/index.js", `export default _=>console.log("helloworld");`);
+    }
+    if (!fs.existsSync(demodir+"/src")) {
+        await fs.outputFile(demodir+"/src/index.js", `import dist from "../../dist/index.js"; dist();`);
+    }
+    if (!fs.existsSync(demodir+"/public")) {
+        await fs.outputFile(demodir+"/public/index.html", indexHTMLTemplate);
+    }
 
+    await fs.remove(distdir);
     const dist = await build({
         outdir:distdir,
         splitting: true,
@@ -68,13 +75,12 @@ export default async (options={})=>{
         bundle:true,
         sourcemap:true,
         minify:!start,
-        entryPoints: [srcdir+"/index.js"],
+        entryPoints:entries,
+        plugins,
         external
     });
 
     const resetDemo = async ()=>{
-        await ensureFile(demodir+"/src/index.js", `import dist from "../../dist/index.js";`);
-        await ensureFile(demodir+"/public/index.html", indexHTMLTemplate);
     
         await fs.remove(demodir+'/build');
         await fs.copy(demodir+'/public', demodir+'/build');

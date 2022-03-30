@@ -10,5 +10,6 @@ slib({
     demodir:"test/demo",                                        //directory of demo
     fetchVars:(async _=>await fs.readJSON("package.json")),     //function returning pairs which will be injected into the demo/build/index.html
     onRuntimeError:console.log,                                 //function that handle dev server runtime errors
-    external:[]   
+    entries:["index.js", "test.js"],
+    external:[]
 })
