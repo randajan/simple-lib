@@ -11,13 +11,12 @@
     "test": "node ./test.js"
   },
   "license": "MIT",
-  "peerDependencies": {
+  "dependencies": {
     "chokidar": "^3.5.3",
-    "esbuild": "^0.14.27",
-    "fs-extra": "^10.0.1",
+    "esbuild": "^0.14.36",
+    "fs-extra": "^10.1.0",
     "live-server": "^1.2.1"
   },
-  "devDependencies": {},
   "files": [
     "dist",
     "README.md",
