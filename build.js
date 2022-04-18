@@ -10,7 +10,7 @@ await build({
     color:true,
     bundle:true,
     sourcemap:true,
-    minify:true,
+    minify:false,
     entryPoints: ["src/index.js"],
     external:["esbuild", "chokidar", "fs-extra", "live-server"],
 });

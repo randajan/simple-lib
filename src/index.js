@@ -30,10 +30,10 @@ const injectFile = async (file, vars={})=>{
 }
 
 
-export default async (options={})=>{
+export default async (isProd=true, options={})=>{
     let {
-        start,
         port,
+        minify,
         srcdir,
         distdir,
         demodir,
@@ -44,8 +44,8 @@ export default async (options={})=>{
         external
     } = options;
 
-    start = start || false;
     port = port || 3000;
+    minify = minify != null ? minify : isProd;
     srcdir = srcdir || "src";
     distdir = distdir || "dist";
     demodir = demodir || "demo";
@@ -74,7 +74,7 @@ export default async (options={})=>{
         color:true,
         bundle:true,
         sourcemap:true,
-        minify:!start,
+        minify,
         entryPoints:entries,
         plugins,
         external
@@ -101,7 +101,7 @@ export default async (options={})=>{
         incremental:true
     });
 
-    if (!start) { return; }
+    if (isProd) { process.exit(0); }
 
     watch([demodir+"/public/**/*"], { ignoreInitial: true }).on('all', async _=>{
         await resetDemo();

@@ -24,18 +24,21 @@ import fs from "fs-extra"; // optional
 
 //those values are default values
 
-slib({
-    start:true,                                                 //true = start dev server; false = generate minify build;
-    port:3000,                                                  //port of dev server
-    srcdir:"src",                                               //direrctory of source code
-    distdir:"dist",                                             //directory of build
-    demodir:"demo",                                             //directory of demo
-    entries:["index.js"],                                       //esbuild entry files
-    plugins:[]                                                  //esbuild plugins
-    fetchVars:(async _=>await fs.readJSON("package.json")),     //function returning pairs of variables which were injected to demo/build/index.html
-    onRuntimeError:console.log,                                 //function that handle dev server runtime errors
-    external:[]   
-})
+slib(
+    isProd=true,                                                    //true = start dev server; false = generate build;
+    {
+        port:3000,                                                  //port of dev server
+        minify:isProd,                                              //true = generate minify build; if null then isProd value will be used
+        srcdir:"src",                                               //direrctory of source code
+        distdir:"dist",                                             //directory of build
+        demodir:"demo",                                             //directory of demo
+        entries:["index.js"],                                       //esbuild entry files
+        plugins:[]                                                  //esbuild plugins
+        fetchVars:(async _=>await fs.readJSON("package.json")),     //function returning pairs of variables which were injected to demo/build/index.html
+        onRuntimeError:console.log,                                 //function that handle dev server runtime errors
+        external:[]   
+    }
+)
 
 ```
 
