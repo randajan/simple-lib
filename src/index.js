@@ -38,8 +38,8 @@ export default async (isProd=true, options={})=>{
         distdir,
         demodir,
         entries,
-        loader,
-        plugins,
+        dist,
+        demo,
         fetchVars,
         onRuntimeError,
         external
@@ -51,8 +51,8 @@ export default async (isProd=true, options={})=>{
     distdir = distdir || "dist";
     demodir = demodir || "demo";
     entries = (entries || ["index.js"]).map(e=>srcdir+"/"+e);
-    plugins = plugins || [];
-    loader = loader || {};
+    dist = dist || {};
+    demo = demo || {};
     fetchVars = fetchVars || (async _=>await fs.readJSON("package.json"));
     onRuntimeError = onRuntimeError || console.log;
     external = external || [];
@@ -68,7 +68,8 @@ export default async (isProd=true, options={})=>{
     }
 
     await fs.remove(distdir);
-    const dist = await build({
+    const distBuild = await build({
+        ...dist,
         outdir:distdir,
         splitting: true,
         format: 'esm',
@@ -78,8 +79,6 @@ export default async (isProd=true, options={})=>{
         sourcemap:true,
         minify,
         entryPoints:entries,
-        plugins,
-        loader,
         external
     });
 
@@ -93,7 +92,8 @@ export default async (isProd=true, options={})=>{
 
     await resetDemo();
 
-    const demo = await build({
+    const demoBuild = await build({
+        ...demo,
         color:true,
         entryPoints: [demodir+'/src/index.js'],
         outdir: demodir+'/build',
@@ -108,12 +108,12 @@ export default async (isProd=true, options={})=>{
 
     watch([demodir+"/public/**/*"], { ignoreInitial: true }).on('all', async _=>{
         await resetDemo();
-        await demo.rebuild().catch(onRuntimeError);
+        await demoBuild.rebuild().catch(onRuntimeError);
     });
 
     watch([srcdir+'/**/*', demodir+"/src/**/*"], { ignoreInitial: true }).on('all', async _=>{
-        await dist.rebuild().catch(onRuntimeError);
-        await demo.rebuild().catch(onRuntimeError);
+        await distBuild.rebuild().catch(onRuntimeError);
+        await demoBuild.rebuild().catch(onRuntimeError);
     });
 
     return server.start({

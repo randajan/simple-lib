@@ -33,8 +33,8 @@ slib(
         distdir:"dist",                                             //directory of build
         demodir:"demo",                                             //directory of demo
         entries:["index.js"],                                       //esbuild entry files
-        plugins:[]                                                  //esbuild plugins
-        loader:{}                                                   //esbuild loader
+        dist:{}                                                     //esbuild dist options
+        demo:{}                                                     //esbuild demo options
         fetchVars:(async _=>await fs.readJSON("package.json")),     //function returning pairs of variables which were injected to demo/build/index.html
         onRuntimeError:console.log,                                 //function that handle dev server runtime errors
         external:[]   
