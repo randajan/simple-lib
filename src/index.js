@@ -38,6 +38,7 @@ export default async (isProd=true, options={})=>{
         distdir,
         demodir,
         entries,
+        loader,
         plugins,
         fetchVars,
         onRuntimeError,
@@ -51,6 +52,7 @@ export default async (isProd=true, options={})=>{
     demodir = demodir || "demo";
     entries = (entries || ["index.js"]).map(e=>srcdir+"/"+e);
     plugins = plugins || [];
+    loader = loader || {};
     fetchVars = fetchVars || (async _=>await fs.readJSON("package.json"));
     onRuntimeError = onRuntimeError || console.log;
     external = external || [];
@@ -77,6 +79,7 @@ export default async (isProd=true, options={})=>{
         minify,
         entryPoints:entries,
         plugins,
+        loader,
         external
     });
 
