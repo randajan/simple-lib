@@ -12,5 +12,5 @@ await build({
     sourcemap:true,
     minify:false,
     entryPoints: ["src/index.js"],
-    external:["esbuild", "chokidar", "fs-extra", "live-server"],
+    external:["esbuild", "chokidar", "fs-extra", "live-server", "worker_threads"],
 });

@@ -28,9 +28,11 @@ slib(
     isProd=true,                                                    //true = start dev server; false = generate build;
     {
         port:3000,                                                  //port of dev server
+        mode:"web",                                                 //"web"=frontend lib, "node"=backend lib
         minify:isProd,                                              //true = generate minify build; if null then isProd value will be used
         srcdir:"src",                                               //direrctory of source code
         distdir:"dist",                                             //directory of build
+        rebuildBuffer:100,                                          //delay between src changed and rebuild happend
         demodir:"demo",                                             //directory of demo
         entries:["index.js"],                                       //esbuild entry files
         dist:{}                                                     //esbuild dist options
