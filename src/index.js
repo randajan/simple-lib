@@ -93,7 +93,8 @@ export default async (isProd = true, o = {}) => {
             sourcemap: true,
             minify: false,
             format: 'iife',
-            incremental: true
+            incremental: true,
+            external
         })
     ])
 
