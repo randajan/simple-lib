@@ -1,4 +1,5 @@
 import { build } from 'esbuild';
+import { builtinModules } from "module";
 import fs from "fs-extra";
 
 await fs.remove("dist");
@@ -12,5 +13,5 @@ await build({
     sourcemap:true,
     minify:false,
     entryPoints: ["src/index.js"],
-    external:["esbuild", "chokidar", "fs-extra", "live-server", "worker_threads"],
+    external:["esbuild", "chokidar", "fs-extra", "live-server", "worker_threads", ...builtinModules],
 });

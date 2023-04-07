@@ -1,6 +1,7 @@
 import { Worker } from "worker_threads";
 import { watch } from "chokidar";
 import { build } from 'esbuild';
+import { builtinModules } from "module";
 import fs from "fs-extra";
 import server from "live-server";
 import { injectFile } from "./inject";
@@ -82,19 +83,19 @@ export default async (isProd = true, o = {}) => {
             sourcemap: true,
             minify,
             entryPoints: entries,
-            external
+            external:[...builtinModules,...external]
         }),
         build({
             ...demo,
             color: true,
             entryPoints: [demodir + '/src/index.js'],
             outdir: demodir + '/build',
+            format:isWeb?"iife":"esm",
             bundle: true,
             sourcemap: true,
             minify: false,
-            format: 'iife',
             incremental: true,
-            external
+            external:[...builtinModules,...external]
         })
     ])
 
