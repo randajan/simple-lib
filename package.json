@@ -6,14 +6,24 @@
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./lib": "./dist/lib/index.js",
+    "./demo": "./dist/demo/index.js",
+    "./info": "./dist/info/index.js"
+  },
   "scripts": {
     "build": "node ./build.js",
     "test": "node ./test.js"
   },
   "license": "MIT",
   "dependencies": {
+    "app-root-path": "^3.1.0",
+    "approot": "^0.2.1",
+    "chalk": "^5.2.0",
     "chokidar": "^3.5.3",
     "esbuild": "^0.14.36",
+    "esbuild-node-externals": "^1.7.0",
     "fs-extra": "^10.1.0",
     "live-server": "^1.2.1"
   },

@@ -1,6 +1,7 @@
 import { build } from 'esbuild';
-import { builtinModules } from "module";
 import fs from "fs-extra";
+import { nodeExternalsPlugin } from 'esbuild-node-externals';
+import { builtinModules } from "module";
 
 await fs.remove("dist");
 
@@ -11,7 +12,8 @@ await build({
     color:true,
     bundle:true,
     sourcemap:true,
-    minify:false,
-    entryPoints: ["src/index.js"],
-    external:["esbuild", "chokidar", "fs-extra", "live-server", "worker_threads", ...builtinModules],
+    //minify:true,
+    entryPoints: ["src/index.js", "src/lib/index.js", "src/node/index.js", "src/web/index.js", "src/info/index.js"],
+    plugins:[nodeExternalsPlugin()],
+    external:builtinModules,
 });

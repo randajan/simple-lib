@@ -1,6 +1,6 @@
 
 export default {
-    html:`
+  html:`
 <!DOCTYPE html>
     <html lang="en">
     
@@ -18,7 +18,20 @@ export default {
     </body>
     
 </html>`,
-    src:`export default _=>console.log("helloworld");`,
-    demo:`import dist from "../../dist/index.js"; dist();`
+  lib:`
+import { info, log } from "@randajan/simple-lib/lib";
 
-}
+export default _=>log.bold.magenta("helloworld", JSON.stringify(info, null, 2));
+`,
+  node:`
+import { info, log } from "@randajan/simple-lib/node";
+import dist from "../../dist/index.js";
+
+dist();
+`,
+  web:`
+import { info, log } from "@randajan/simple-lib/web";
+import dist from "../../dist/index.js";
+
+dist();
+`}

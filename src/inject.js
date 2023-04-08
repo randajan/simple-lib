@@ -10,3 +10,5 @@ export const injectString = (string, vars={})=>{
 
 
 export const injectFile = async (file, vars={})=>await fs.writeFile(file, injectString(await fs.readFile(file), vars));
+
+

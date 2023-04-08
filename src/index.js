@@ -1,124 +1,52 @@
 import { Worker } from "worker_threads";
 import { watch } from "chokidar";
-import { build } from 'esbuild';
-import { builtinModules } from "module";
+
 import fs from "fs-extra";
 import server from "live-server";
 import { injectFile } from "./inject";
+import { parseConfig } from "./config";
 import templates from "./templates";
 
-const { NODE_ENV, npm_package_version, npm_package_name } = process.env;
+export default async (isProd = true, config = {}) => {
+    const { port, isWeb, mode, lib, demo, injects, rebuildBuffer, log } = parseConfig(isProd, config);
+    const logbold = log.bold;
+    const logred = logbold.red;
 
-export const argv = {};
-for ( const arg of process.argv ) {
-  const pair = String(arg).split("=");
-  if (pair.length === 2) { Object.defineProperty(argv, pair[0], {value:pair[1], enumerable:true}); }
-}
-
-const name = npm_package_name;
-const version = npm_package_version;
-const env = argv.env || NODE_ENV;
-
-export const log = (color, ...msgs)=>console.log(
-    color,
-    [
-        (env ? [name, version, env] : [name, version]).join(" "),
-        (new Date()).toLocaleTimeString("cs-CZ"),
-        msgs.join(" "),
-    ].join(" | "),
-    "\x1b[0m"
-);
-
-const _modes = ["web", "node"];
-
-export default async (isProd = true, o = {}) => {
-
-    const port = o.port || 3000;
-    const mode = o.mode != null ? o.mode : _modes[0];
-    const minify = o.minify != null ? o.minify : isProd;
-    const srcdir = o.srcdir || "src";
-    const distdir = o.distdir || "dist";
-    const demodir = o.demodir || "demo";
-    const entries = (o.entries || ["index.js"]).map(e => srcdir + "/" + e);
-    const dist = o.dist || {};
-    const demo = o.demo || {};
-    const fetchVars = o.fetchVars || (async _ => await fs.readJSON("package.json"));
-    const onRuntimeError = o.onRuntimeError || console.log;
-    const external = o.external || [];
-    const rebuildBuffer = Math.max(0, Number(o.rebuildBuffer) || 100);
-
-    if (!_modes.includes(mode)) { throw Error(`mode should be one of '${_modes.join("', '")}' but '${mode}' provided`); }
-    const isWeb = mode === "web";
-
-    if (!fs.existsSync(srcdir)) {
-        await fs.outputFile(srcdir + "/index.js", templates.src);
-    }
-    if (!fs.existsSync(demodir + "/src")) {
-        await fs.outputFile(demodir + "/src/index.js", templates.demo);
-    }
-    if (isWeb && !fs.existsSync(demodir + "/public")) {
-        await fs.outputFile(demodir + "/public/index.html", templates.html);
-    }
+    if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(lib.srcdir + "/index.js", templates.lib); }
+    if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(demo.srcdir + "/index.js", isWeb ? templates.web : templates.node); }
+    if (isWeb && !fs.existsSync(demo.dir + "/public")) { await fs.outputFile(demo.dir + "/public/index.html", templates.html); }
 
     const buildPublic = async () => {
-
-        await fs.remove(demodir + '/build');
+        await fs.remove(demo.distdir);
         if (!isWeb) { return; }
-
-        await fs.copy(demodir + '/public', demodir + '/build');
-        await injectFile(demodir + '/build/index.html', await fetchVars());
+        await fs.copy(demo.dir + '/public', demo.distdir);
+        await Promise.all(injects.map(file=>injectFile(demo.distdir+"/"+file, demo.info)));
     }
 
     await buildPublic();
-
-    const [srcBuild, demoBuild] = await Promise.all([
-        build({
-            ...dist,
-            outdir: distdir,
-            splitting: true,
-            format: 'esm',
-            incremental: true,
-            color: true,
-            bundle: true,
-            sourcemap: true,
-            minify,
-            entryPoints: entries,
-            external:[...builtinModules,...external]
-        }),
-        build({
-            ...demo,
-            color: true,
-            entryPoints: [demodir + '/src/index.js'],
-            outdir: demodir + '/build',
-            format:isWeb?"iife":"esm",
-            bundle: true,
-            sourcemap: true,
-            minify: false,
-            incremental: true,
-            external:[...builtinModules,...external]
-        })
-    ])
+    await lib.rebuild();
+    await demo.rebuild();
 
     if (isProd) { return; }
 
-    let worker;
     const rebuildDemo = async (rebuildPublic=false)=>{
         if (rebuildPublic) { await buildPublic(); }
-        await demoBuild.rebuild().catch(onRuntimeError);
+        await demo.rebuild();
         if (isWeb) { return; }
-        if (worker) { worker.terminate(); }
-        worker = new Worker(("./"+demodir+"/build/index.js").replaceAll("\\", "/"));
+        if (demo.current) { demo.current.postMessage("shutdown"); }
+        demo.current = new Worker(("./"+demo.distdir+"/index.js").replaceAll("\\", "/"));
     }
-    const rebuildSrc = async _=>{
-        await srcBuild.rebuild().catch(onRuntimeError);
+    const rebuildLib = async _=>{
+        await lib.rebuild();
         await rebuildDemo(false);
     };
 
-    const rebootOn = (name, color, path, exe, ignored) => {
+    const rebootOn = (name, customLog, path, exe, ignored) => {
         const reboot = async _ => {
             const msg = name + " change";
-            try { await exe(); } catch (e) { log("\x1b[1m\x1b[31m", msg, "failed"); console.log(e.stack); return; };
-            log(color, msg + "d");
+            try { await exe(); } catch (e) { logred(msg, " failed"); log(e.stack); return; };
+            if (demo.current) { demo.current.postMessage("refresh:"+name); }
+            customLog(msg + "d");
         }
 
         let timer;
@@ -128,27 +56,29 @@ export default async (isProd = true, o = {}) => {
         });
     }
 
-    log("\x1b[47m\x1b[30m", `Started`);
-
+    logbold.inverse(`Started`);
     await rebuildDemo(false);
 
-    ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(signal=>{
-        process.on(signal, _=>{if (worker) { worker.terminate(); }});
-    })
-
-    rebootOn("Source", "\x1b[1m\x1b[32m", srcdir + '/**/*', rebuildSrc);
-    rebootOn("Demo", "\x1b[1m\x1b[34m", demodir + "/src/**/*", _=>rebuildDemo(false));
+    rebootOn("Lib", logbold.blue, lib.srcdir + '/**/*', rebuildLib);
+    rebootOn("Demo", logbold.green, demo.srcdir + "/**/*", _=>rebuildDemo(false));
 
     if (isWeb) {
-        rebootOn("Public", "\x1b[1m\x1b[35m", demodir+'/public/**/*', _=>rebuildDemo(true));
+        rebootOn("Public", logbold.magenta, demo.dir+'/public/**/*', _=>rebuildDemo(true));
         return server.start({
             port,
-            root: demodir + "/build",
+            root: demo.distdir,
             open: true,
             file: "index.html",
             wait: 100,
             logLevel: 0
         });
+    } else {
+        ["SIGTERM", "SIGINT", "SIGQUIT"].forEach(signal=>{
+            process.on(signal, _=>{
+                demo.current.on("exit", _=>process.exit(0));
+                demo.current.postMessage("shutdown");
+            });
+        })
     }
 
 }

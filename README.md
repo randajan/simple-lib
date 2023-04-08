@@ -25,21 +25,34 @@ import fs from "fs-extra"; // optional
 //those values are default values
 
 slib(
-    isProd=true,                                                    //true = start dev server; false = generate build;
+    isProd=true,                        //true = start dev server; false = generate build;
     {
-        port:3000,                                                  //port of dev server
-        mode:"web",                                                 //"web"=frontend lib, "node"=backend lib
-        minify:isProd,                                              //true = generate minify build; if null then isProd value will be used
-        srcdir:"src",                                               //direrctory of source code
-        distdir:"dist",                                             //directory of build
-        rebuildBuffer:100,                                          //delay between src changed and rebuild happend
-        demodir:"demo",                                             //directory of demo
-        entries:["index.js"],                                       //esbuild entry files
-        dist:{}                                                     //esbuild dist options
-        demo:{}                                                     //esbuild demo options
-        fetchVars:(async _=>await fs.readJSON("package.json")),     //function returning pairs of variables which were injected to demo/build/index.html
-        onRuntimeError:console.log,                                 //function that handle dev server runtime errors
-        external:[]   
+        port:3000,                      //port of dev server
+        mode:"web",                     //"web"=frontend lib, "node"=backend lib
+        rebuildBuffer:100,              //delay between src changed and rebuild happens
+        external:[],                    //global esbuild external libraries
+        plugins:[],                     //global esbuild plugins
+        info:{},                        //global package info
+        lib:{
+            dir:"",                     //lib root directory
+            srcdir:"src",               //lib source code directory
+            distdir:"dist",             //lib build directory
+            minify:isProd,              //lib minify - true = generate minify build; if null then isProd value will be used
+            entries:["index.js"],       //lib entries files
+            external:[],                //lib esbuild external libraries
+            plugins:[],                 //lib esbuild plugins
+            info:{}                     //lib package info
+        },                                        
+        demo:{                          
+            dir:"demo",                 //demo root directory
+            srcdir:"src",               //demo source code directory
+            distdir:"dist",             //demo build directory
+            minify:isProd,              //demo minify - true = generate minify build; if null then isProd value will be used
+            entries:["index.js"],       //demo entries files
+            external:[],                //demo esbuild external libraries
+            plugins:[],                 //demo esbuild plugins
+            info:{}                     //demo package info
+        }
     }
 )
 
