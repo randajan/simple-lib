@@ -9,7 +9,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./lib": "./dist/lib/index.js",
-    "./demo": "./dist/demo/index.js",
+    "./web": "./dist/web/index.js",
+    "./node": "./dist/node/index.js",
     "./info": "./dist/info/index.js"
   },
   "scripts": {
