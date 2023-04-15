@@ -27,7 +27,7 @@ export default async (isProd = true, config = {}) => {
     await lib.rebuild();
     await demo.rebuild();
 
-    if (isProd) { return; }
+    if (isProd) { process.exit(0); }
 
     const rebuildDemo = async (rebuildPublic=false)=>{
         if (rebuildPublic) { await buildPublic(); }

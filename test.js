@@ -2,7 +2,7 @@ import slib from "./dist/index.js";
 import fs from "fs-extra";
 
 slib(
-    false,                              //true = start dev server; false = generate build;
+    true,                              //true = start dev server; false = generate build;
     {
         port:3000,                      //port of dev server
         mode:"node",                    //"web"=frontend lib, "node"=backend lib
