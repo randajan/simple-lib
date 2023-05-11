@@ -32,6 +32,7 @@ slib(
         rebuildBuffer:100,              //delay between src changed and rebuild happens
         external:[],                    //global esbuild external libraries
         plugins:[],                     //global esbuild plugins
+        loader:{},                      //global esbuild loader
         info:{},                        //global package info
         lib:{
             dir:"",                     //lib root directory
@@ -41,6 +42,7 @@ slib(
             entries:["index.js"],       //lib entries files
             external:[],                //lib esbuild external libraries
             plugins:[],                 //lib esbuild plugins
+            loader:{},                  //lib exbuild loader
             info:{}                     //lib package info
         },                                        
         demo:{                          
@@ -51,6 +53,7 @@ slib(
             entries:["index.js"],       //demo entries files
             external:[],                //demo esbuild external libraries
             plugins:[],                 //demo esbuild plugins
+            loader:{},                  //demo esbuild loader
             info:{}                     //demo package info
         }
     }

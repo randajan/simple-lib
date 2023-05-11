@@ -12,16 +12,16 @@ export default async (isProd = true, config = {}) => {
     const logbold = log.bold;
     const logred = logbold.red;
 
-    if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(lib.srcdir + "/index.js", templates.lib); }
-    if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(demo.srcdir + "/index.js", isWeb ? templates.web : templates.node); }
-    if (isWeb && !fs.existsSync(demo.dir + "/public")) { await fs.outputFile(demo.dir + "/public/index.html", templates.html); }
-
     const buildPublic = async () => {
         await fs.remove(demo.distdir);
         if (!isWeb) { return; }
         await fs.copy(demo.dir + '/public', demo.distdir);
         await Promise.all(injects.map(file=>injectFile(demo.distdir+"/"+file, demo.info)));
     }
+
+    if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(lib.srcdir + "/index.js", templates.lib); }
+    if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(demo.srcdir + "/index.js", isWeb ? templates.web : templates.node); }
+    if (isWeb && !fs.existsSync(demo.dir + "/public")) { await fs.outputFile(demo.dir + "/public/index.html", templates.html); }
 
     await buildPublic();
     await lib.rebuild();
@@ -44,8 +44,9 @@ export default async (isProd = true, config = {}) => {
     const rebootOn = (name, customLog, path, exe, ignored) => {
         const reboot = async _ => {
             const msg = name + " change";
+            const before = demo.current;
             try { await exe(); } catch (e) { logred(msg, " failed"); log(e.stack); return; };
-            if (demo.current) { demo.current.postMessage("refresh:"+name); }
+            if (before) { before.postMessage("refresh:"+name); }
             customLog(msg + "d");
         }
 

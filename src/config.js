@@ -22,13 +22,14 @@ const env = argv.env || NODE_ENV;
 const _modes = ["web", "node"];
 const _externalsPlugin = nodeExternalsPlugin({ allowList:["info", "lib", "node", "web"].map(v=>"@randajan/simple-lib/"+v)});
 
-const buildFactory = ({entries, distdir, external, plugins, format, info})=>{
+const buildFactory = ({entries, distdir, minify, splitting, external, plugins, loader, format, info })=>{
     let _build; //cache esbuild
 
     return async _=>{
         if (_build) { await _build.rebuild(); return _build; }
         return _build = await build({
             format,
+            minify,
             color:true,
             bundle: true,
             sourcemap: true,
@@ -37,8 +38,10 @@ const buildFactory = ({entries, distdir, external, plugins, format, info})=>{
             entryPoints:entries,
             outdir:distdir,
             define:{__slib_info:JSON.stringify(info)},
+            splitting,
             external,
-            plugins
+            plugins,
+            loader
         });
     }
 
