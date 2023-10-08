@@ -13,7 +13,14 @@ await build({
     bundle:true,
     sourcemap:true,
     //minify:true,
-    entryPoints: ["src/index.js", "src/lib/index.js", "src/node/index.js", "src/web/index.js", "src/info/index.js"],
+    entryPoints: [
+        "src/index.js",
+        "src/peers.js",
+        "src/lib/index.js",
+        "src/node/index.js",
+        "src/web/index.js",
+        "src/info/index.js",
+    ],
     plugins:[nodeExternalsPlugin()],
     external:builtinModules,
 });

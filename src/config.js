@@ -12,7 +12,7 @@ for ( const arg of process.argv ) {
   if (pair.length === 2) { Object.defineProperty(argv, pair[0], {value:pair[1], enumerable:true}); }
 }
 
-const root = approot.path;
+export const root = approot.path;
 const name = npm_package_name;
 const description = npm_package_description;
 const version = npm_package_version;

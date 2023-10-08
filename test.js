@@ -2,10 +2,10 @@ import slib from "./dist/index.js";
 import fs from "fs-extra";
 
 slib(
-    true,                              //true = start dev server; false = generate build;
+    false,                              //false = start dev server; true = generate build;
     {
         port:3000,                      //port of dev server
-        mode:"node",                    //"web"=frontend lib, "node"=backend lib
+        mode:"web",                    //"web"=frontend lib, "node"=backend lib
         rebuildBuffer:500,              //delay between src changed and rebuild happens
         external:[],                    //global esbuild external libraries
         plugins:[],                     //global esbuild plugins
