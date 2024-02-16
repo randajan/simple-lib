@@ -22,7 +22,7 @@ const env = argv.env || NODE_ENV;
 const _modes = ["web", "node"];
 const _externalsPlugin = nodeExternalsPlugin({ allowList:["info", "lib", "node", "web"].map(v=>"@randajan/simple-lib/"+v)});
 
-const buildFactory = ({entries, distdir, minify, splitting, external, plugins, loader, format, info })=>{
+const buildFactory = ({entries, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
     let _build; //cache esbuild
 
     return async _=>{
@@ -41,7 +41,12 @@ const buildFactory = ({entries, distdir, minify, splitting, external, plugins, l
             splitting,
             external,
             plugins,
-            loader
+            loader,
+            jsx:jsx.transform,
+            jsxDev:jsx.dev,
+            jsxFactory:jsx.factory,
+            jsxFragment:jsx.fragment || jsx.factory,
+            jsxImportSource:jsx.importSource
         });
     }
 
@@ -57,6 +62,7 @@ export const parseConfig = (isProd, c={})=>{
     const external = c.external || [];
     const plugins = c.plugins || [];
     const loader = c.loader || {};
+    const jsx = c.jsx || {};
 
     if (!_modes.includes(mode)) { throw Error(`mode should be one of '${_modes.join("', '")}' but '${mode}' provided`); }
     const isWeb = mode === "web";
@@ -80,12 +86,14 @@ export const parseConfig = (isProd, c={})=>{
 
     for (const x of [lib, demo]) {
         const dir = (x.dir ? x.dir + "/" : "");
+        
         x.srcdir = dir + (x.srcdir || "src");
         x.distdir = dir + (x.distdir || "dist");
         x.entries = (x.entries || ["index.js"]).map(e=>x.srcdir+"/"+e);
         x.minify = x.minify != null ? x.minify : isProd;
         x.external = [...(x.external || []), ...external, ...builtinModules];
         x.loader = {...(x.loader || {}), ...loader};
+        x.jsx = x.jsx ? {...jsx, ...x.jsx} : jsx;
         x.info = { ...(x.info || {}), ...argv, ...info, port, mode, dir:{ root, dist:x.distdir }}
         x.rebuild = buildFactory(x);
     }

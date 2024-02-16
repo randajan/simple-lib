@@ -28,7 +28,13 @@ slib(
             entries:["index.js"],       //demo entries files
             external:[],                //demo esbuild external libraries
             plugins:[],                 //demo esbuild plugins
-            info:{}                     //demo package info
+            info:{},                     //demo package info
+            loader:{
+                ".js":"jsx"
+            },
+            jsx:{
+                factory:"PDFComponent.create"
+            }
         }
     }
 )

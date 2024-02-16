@@ -19,6 +19,7 @@ export default async (isProd = true, config = {}) => {
         await Promise.all(injects.map(file=>injectFile(demo.distdir+"/"+file, demo.info)));
     }
 
+    if (!fs.existsSync("./peers.js")) { await fs.outputFile(lib.dir + "/peers.js", templates.peers); }
     if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(lib.srcdir + "/index.js", templates.lib); }
     if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(demo.srcdir + "/index.js", isWeb ? templates.web : templates.node); }
     if (isWeb && !fs.existsSync(demo.dir + "/public")) { await fs.outputFile(demo.dir + "/public/index.html", templates.html); }
