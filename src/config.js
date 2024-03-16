@@ -56,6 +56,7 @@ export const parseConfig = (isProd, c={})=>{
 
     const port = c.port || argv.port || 3000;
     const mode = c.mode != null ? c.mode : _modes[0];
+    const minify = c.minify != null ? c.minify : isProd;
     const info = {...(c.info ? c.info : {}), isProd, name, description, version, author, env, mode};
     const injects = c.injects || ["index.html"];
     const rebuildBuffer = Math.max(0, Number(c.rebuildBuffer) || 100);
@@ -90,7 +91,7 @@ export const parseConfig = (isProd, c={})=>{
         x.srcdir = dir + (x.srcdir || "src");
         x.distdir = dir + (x.distdir || "dist");
         x.entries = (x.entries || ["index.js"]).map(e=>x.srcdir+"/"+e);
-        x.minify = x.minify != null ? x.minify : isProd;
+        x.minify = x.minify != null ? x.minify : minify;
         x.external = [...(x.external || []), ...external, ...builtinModules];
         x.loader = {...(x.loader || {}), ...loader};
         x.jsx = x.jsx ? {...jsx, ...x.jsx} : jsx;
