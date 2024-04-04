@@ -99,5 +99,6 @@ export const parseConfig = (isProd, c={})=>{
         x.rebuild = buildFactory(x);
     }
 
-    return { port, lib, demo, isWeb, mode, injects, rebuildBuffer, log:logger(name, version, env) }
+    const peersFile = (lib.dir ? lib.dir+"/" : "")+"peers.js";
+    return { port, lib, demo, peersFile, isWeb, mode, injects, rebuildBuffer, log:logger(name, version, env) }
 }
