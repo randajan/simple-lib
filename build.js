@@ -12,7 +12,6 @@ await build({
     color:true,
     bundle:true,
     sourcemap:true,
-    //minify:true,
     entryPoints: [
         "src/index.js",
         "src/peers.js",

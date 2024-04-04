@@ -1,6 +1,6 @@
 import { parentPort } from "worker_threads";
 import { info } from "../info";
-import { logger } from "../logger";
+import { logger } from "../tools/logger";
 
 export default info;
 

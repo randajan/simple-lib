@@ -3,24 +3,17 @@ import { build } from 'esbuild';
 import approot from "app-root-path";
 import { logger } from "./logger";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
+import fse from "fs-extra";
 
-const { NODE_ENV, npm_package_version, npm_package_name, npm_package_author_name, npm_package_description } = process.env;
+import argv from "./argv";
 
-export const argv = {};
-for ( const arg of process.argv ) {
-  const pair = String(arg).split("=");
-  if (pair.length === 2) { Object.defineProperty(argv, pair[0], {value:pair[1], enumerable:true}); }
-}
-
+export const env = argv.env || process?.env?.NODE_ENV || "dev";
 export const root = approot.path;
-const name = npm_package_name;
-const description = npm_package_description;
-const version = npm_package_version;
-const author = npm_package_author_name;
-const env = argv.env || NODE_ENV;
 
-const _modes = ["web", "node"];
+const { name, description, version, author } = fse.readJSONSync(root + "/package.json");
+
 const _externalsPlugin = nodeExternalsPlugin({ allowList:["info", "lib", "node", "web"].map(v=>"@randajan/simple-lib/"+v)});
+const _modes = ["web", "node"];
 
 const buildFactory = ({entries, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
     let _build; //cache esbuild
@@ -49,15 +42,15 @@ const buildFactory = ({entries, distdir, minify, splitting, external, plugins, l
             jsxImportSource:jsx.importSource
         });
     }
-
 }
 
-export const parseConfig = (isProd, c={})=>{
+export const parseConfig = (isBuild, c={})=>{
+    isBuild = isBuild == null ? isBuild : argv
 
     const port = c.port || argv.port || 3000;
     const mode = c.mode != null ? c.mode : _modes[0];
-    const minify = c.minify != null ? c.minify : isProd;
-    const info = {...(c.info ? c.info : {}), isProd, name, description, version, author, env, mode};
+    const minify = c.minify != null ? c.minify : false;
+    const info = {...(c.info ? c.info : {}), isBuild, name, description, version, author, env, mode};
     const injects = c.injects || ["index.html"];
     const rebuildBuffer = Math.max(0, Number(c.rebuildBuffer) || 100);
     const external = c.external || [];

@@ -25,36 +25,58 @@ import fs from "fs-extra"; // optional
 //those values are default values
 
 slib(
-    isProd=true,                        //true = start dev server; false = generate build;
+    isBuild=true,                       //true = generate build; false = start dev server;
     {
         port:3000,                      //port of dev server
         mode:"web",                     //"web"=frontend lib, "node"=backend lib
         rebuildBuffer:100,              //delay between src changed and rebuild happens
+        minify:false,                   //global minify - true = generate minify build
         external:[],                    //global esbuild external libraries
         plugins:[],                     //global esbuild plugins
         loader:{},                      //global esbuild loader
         info:{},                        //global package info
+        jsx:{                           //global jsx config
+            transform:undefined,        //global es-build jsx
+            dev:undefined,              //global es-build jsxDev
+            factory:undefined,          //global es-build jsxFactory
+            fragment:jsx.factory,       //global es-build jsxFragment; if null then jsx.factory will be set
+            importSource:undefined      //global es-build jsxImportSource
+        },
         lib:{
             dir:"",                     //lib root directory
             srcdir:"src",               //lib source code directory
             distdir:"dist",             //lib build directory
-            minify:isProd,              //lib minify - true = generate minify build; if null then isProd value will be used
+            minify:false,               //lib minify - true = generate minify build
             entries:["index.js"],       //lib entries files
             external:[],                //lib esbuild external libraries
             plugins:[],                 //lib esbuild plugins
             loader:{},                  //lib exbuild loader
-            info:{}                     //lib package info
+            info:{},                    //lib package info
+            jsx:{                       //lib jsx config
+                transform:undefined,    //lib es-build jsx
+                dev:undefined,          //lib es-build jsxDev
+                factory:undefined,      //lib es-build jsxFactory
+                fragment:jsx.factory,   //lib es-build jsxFragment; if null then jsx.factory will be set
+                importSource:undefined  //lib es-build jsxImportSource
+            },
         },                                        
         demo:{                          
             dir:"demo",                 //demo root directory
             srcdir:"src",               //demo source code directory
             distdir:"dist",             //demo build directory
-            minify:isProd,              //demo minify - true = generate minify build; if null then isProd value will be used
+            minify:false,               //demo minify - true = generate minify build
             entries:["index.js"],       //demo entries files
             external:[],                //demo esbuild external libraries
             plugins:[],                 //demo esbuild plugins
             loader:{},                  //demo esbuild loader
-            info:{}                     //demo package info
+            info:{},                    //demo package info
+            jsx:{                       //demo jsx config
+                transform:undefined,    //demo es-build jsx
+                dev:undefined,          //demo es-build jsxDev
+                factory:undefined,      //demo es-build jsxFactory
+                fragment:jsx.factory,   //demo es-build jsxFragment; if null then jsx.factory will be set
+                importSource:undefined  //demo es-build jsxImportSource
+            },
         }
     }
 )
@@ -65,10 +87,13 @@ slib(
 
 ```javascript
 ...
-    "chokidar": "^3.5.3",
-    "esbuild": "^0.14.27",
-    "fs-extra": "^10.0.1",
-    "live-server": "^1.2.1"
+    "app-root-path": "^3.1.0",
+    "chalk": "^5.2.0",
+    "chokidar": "^3.6.0",
+    "esbuild": "0.16.17",
+    "esbuild-node-externals": "^1.13.0",
+    "fs-extra": "^11.2.0",
+    "live-server": "^1.2.2"
 ...
 ```
 

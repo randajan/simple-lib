@@ -3,12 +3,16 @@ import { watch } from "chokidar";
 
 import fs from "fs-extra";
 import server from "live-server";
-import { injectFile } from "./inject";
-import { parseConfig } from "./config";
-import templates from "./templates";
+import argv from "./tools/argv";
+import { injectFile } from "./tools/inject";
+import { parseConfig, root } from "./tools/config";
+import templates from "./tools/templates";
 
-export default async (isProd = true, config = {}) => {
-    const { port, isWeb, mode, lib, demo, peersFile, injects, rebuildBuffer, log } = parseConfig(isProd, config);
+
+export { root, argv }
+
+export default async (isBuild, config = {}) => {
+    const { port, isWeb, mode, lib, demo, peersFile, injects, rebuildBuffer, log } = parseConfig(isBuild, config);
     const logbold = log.bold;
     const logred = logbold.red;
 
@@ -28,7 +32,7 @@ export default async (isProd = true, config = {}) => {
     await lib.rebuild();
     await demo.rebuild();
 
-    if (isProd) { process.exit(0); }
+    if (isBuild) { process.exit(0); }
 
     const rebuildDemo = async (rebuildPublic=false)=>{
         if (rebuildPublic) { await buildPublic(); }
