@@ -12,6 +12,8 @@ import templates from "./tools/templates";
 export { root, argv }
 
 export default async (isBuild, config = {}) => {
+    isBuild = typeof isBuild === "boolean" ? isBuild : (argv.isBuild || false);
+
     const { port, isWeb, mode, lib, demo, peersFile, injects, rebuildBuffer, log } = parseConfig(isBuild, config);
     const logbold = log.bold;
     const logred = logbold.red;

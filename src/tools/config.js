@@ -45,8 +45,6 @@ const buildFactory = ({entries, distdir, minify, splitting, external, plugins, l
 }
 
 export const parseConfig = (isBuild, c={})=>{
-    isBuild = isBuild == null ? isBuild : argv
-
     const port = c.port || argv.port || 3000;
     const mode = c.mode != null ? c.mode : _modes[0];
     const minify = c.minify != null ? c.minify : false;
