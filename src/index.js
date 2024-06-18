@@ -29,6 +29,9 @@ export default async (isBuild, config = {}) => {
     if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(lib.srcdir + "/index.js", templates.lib); }
     if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(demo.srcdir + "/index.js", isWeb ? templates.web : templates.node); }
     if (isWeb && !fs.existsSync(demo.dir + "/public")) { await fs.outputFile(demo.dir + "/public/index.html", templates.html); }
+    
+    if (fs.existsSync(lib.distdir)) { await fs.remove(lib.distdir); }
+    if (fs.existsSync(demo.distdir)) { await fs.remove(demo.distdir); }
 
     await buildPublic();
     await lib.rebuild();
