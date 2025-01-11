@@ -98,7 +98,7 @@ export const parseConfig = (isBuild, c={})=>{
         return {srcdir, distdir, rebuild}; 
     });
 
-    const pub = !isWeb ? {} : {
+    const pub = !isWeb ? null : {
         srcdir:demo.dir+ "/public",
         distdir:demo.distdir+"/public",
         rebuild:async () => {
