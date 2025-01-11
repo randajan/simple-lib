@@ -27,6 +27,7 @@ slib(
             minify:false,               //lib minify - true = generate minify build
             entries:["index.js"],       //lib entries files
             external:[],                //lib esbuild external libraries
+            statics:["static"],                 //lib statics files and folders
             plugins:[],                 //lib esbuild plugins
             loader:{},                  //lib exbuild loader
             info:{},                    //lib package info

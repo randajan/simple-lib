@@ -61,7 +61,7 @@ export default async (isBuild, config = {}) => {
         }
 
         let timer;
-        watch(path, { ignoreInitial: true, ignored }).on('all', (...args) => {
+        watch(path + '/**/*', { ignoreInitial: true, ignored }).on('all', (...args) => {
             clearTimeout(timer);
             timer = setTimeout(reboot, rebuildBuffer);
         });
@@ -70,11 +70,19 @@ export default async (isBuild, config = {}) => {
     logbold.inverse(`Started`);
     await rebuildDemo(false);
 
-    rebootOn("Lib", logbold.blue, lib.srcdir + '/**/*', rebuildLib);
-    rebootOn("Demo", logbold.green, demo.srcdir + "/**/*", _=>rebuildDemo(false));
+    const libIgnore = lib.statics.map(stc=>{
+        const srcdir = lib.srcdir+"/"+stc;
+        const distdir = lib.distdir+"/"+stc;
+        rebootOn("Static", logbold, srcdir, _=>fs.copy(srcdir, distdir));
+        return srcdir;
+    });
+
+    rebootOn("Lib", logbold.blue, lib.srcdir, rebuildLib, libIgnore);
+    rebootOn("Demo", logbold.green, demo.srcdir, _=>rebuildDemo(false), isWeb ? [demo.dir+"/public"] : undefined);
+
 
     if (isWeb) {
-        rebootOn("Public", logbold.magenta, demo.dir+'/public/**/*', _=>rebuildDemo(true));
+        rebootOn("Public", logbold.magenta, demo.dir+'/public', _=>rebuildDemo(true));
         return server.start({
             port,
             root: demo.distdir,

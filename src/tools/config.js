@@ -66,6 +66,7 @@ export const parseConfig = (isBuild, c={})=>{
     lib.format = "esm";
     lib.splitting = true;
     lib.plugins = [...(lib.plugins || []), ...plugins, _externalsPlugin];
+    lib.statics = lib.statics || [];
 
     demo.dir = demo.dir || "demo";
     demo.format = "iife";
