@@ -4,7 +4,6 @@ import { watch } from "chokidar";
 import fs from "fs-extra";
 import server from "live-server";
 import argv from "./tools/argv";
-import { injectFile } from "./tools/inject";
 import { parseConfig, root } from "./tools/config";
 import templates from "./tools/templates";
 
@@ -14,33 +13,26 @@ export { root, argv }
 export default async (isBuild, config = {}) => {
     isBuild = typeof isBuild === "boolean" ? isBuild : (argv.isBuild || false);
 
-    const { port, isWeb, mode, lib, demo, peersFile, injects, rebuildBuffer, log } = parseConfig(isBuild, config);
+    const { port, isWeb, mode, lib, demo, pub, statics, peersFile, rebuildBuffer, log } = parseConfig(isBuild, config);
     const logbold = log.bold;
     const logred = logbold.red;
-
-    const buildPublic = async () => {
-        await fs.remove(demo.distdir);
-        if (!isWeb) { return; }
-        await fs.copy(demo.dir + '/public', demo.distdir);
-        await Promise.all(injects.map(file=>injectFile(demo.distdir+"/"+file, demo.info)));
-    }
 
     if (!fs.existsSync(peersFile)) { await fs.outputFile(peersFile, templates.peers); }
     if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(lib.srcdir + "/index.js", templates.lib); }
     if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(demo.srcdir + "/index.js", isWeb ? templates.web : templates.node); }
-    if (isWeb && !fs.existsSync(demo.dir + "/public")) { await fs.outputFile(demo.dir + "/public/index.html", templates.html); }
+    if (pub && !fs.existsSync(pub.srcdir)) { await fs.outputFile(pub.srcdir + "/index.html", templates.html); }
     
     if (fs.existsSync(lib.distdir)) { await fs.remove(lib.distdir); }
     if (fs.existsSync(demo.distdir)) { await fs.remove(demo.distdir); }
 
-    await buildPublic();
+    await pub?.rebuild();
+    await Promise.all(statics.map(s=>s.rebuild()));
     await lib.rebuild();
     await demo.rebuild();
-
+    
     if (isBuild) { process.exit(0); }
 
-    const rebuildDemo = async (rebuildPublic=false)=>{
-        if (rebuildPublic) { await buildPublic(); }
+    const rebuildDemo = async ()=>{
         await demo.rebuild();
         if (isWeb) { return; }
         if (demo.current) { demo.current.postMessage("shutdown"); }
@@ -48,7 +40,7 @@ export default async (isBuild, config = {}) => {
     }
     const rebuildLib = async _=>{
         await lib.rebuild();
-        await rebuildDemo(false);
+        await rebuildDemo();
     };
 
     const rebootOn = (name, customLog, path, exe, ignored) => {
@@ -67,22 +59,20 @@ export default async (isBuild, config = {}) => {
         });
     }
 
-    logbold.inverse(`Started`);
-    await rebuildDemo(false);
-
-    const libIgnore = lib.statics.map(stc=>{
-        const srcdir = lib.srcdir+"/"+stc;
-        const distdir = lib.distdir+"/"+stc;
-        rebootOn("Static", logbold, srcdir, _=>fs.copy(srcdir, distdir));
+    const libIgnore = statics.map(({srcdir, rebuild})=>{
+        rebootOn("Static", logbold.cyan, srcdir, async _=>{ await rebuild(); rebuildDemo(); });
         return srcdir;
     });
 
-    rebootOn("Lib", logbold.blue, lib.srcdir, rebuildLib, libIgnore);
-    rebootOn("Demo", logbold.green, demo.srcdir, _=>rebuildDemo(false), isWeb ? [demo.dir+"/public"] : undefined);
 
+    logbold.inverse(`Started`);
+    await rebuildDemo();
+
+    rebootOn("Lib", logbold.blue, lib.srcdir, rebuildLib, libIgnore);
+    rebootOn("Demo", logbold.green, demo.srcdir, rebuildDemo, [pub?.srcdir]);
 
     if (isWeb) {
-        rebootOn("Public", logbold.magenta, demo.dir+'/public', _=>rebuildDemo(true));
+        rebootOn("Public", logbold.magenta, pub.srcdir, async _=>{ await pub.rebuild(); rebuildDemo(); });
         return server.start({
             port,
             root: demo.distdir,

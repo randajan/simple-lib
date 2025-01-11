@@ -4,6 +4,7 @@ import approot from "app-root-path";
 import { logger } from "./logger";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
 import fse from "fs-extra";
+import { injectFile } from "../tools/inject";
 
 import argv from "./argv";
 
@@ -66,7 +67,6 @@ export const parseConfig = (isBuild, c={})=>{
     lib.format = "esm";
     lib.splitting = true;
     lib.plugins = [...(lib.plugins || []), ...plugins, _externalsPlugin];
-    lib.statics = lib.statics || [];
 
     demo.dir = demo.dir || "demo";
     demo.format = "iife";
@@ -91,6 +91,22 @@ export const parseConfig = (isBuild, c={})=>{
         x.rebuild = buildFactory(x);
     }
 
+    const statics = !lib.statics ? [] : lib.statics.map(stc=>{
+        const srcdir = lib.srcdir+"/"+stc;
+        const distdir = lib.distdir+"/"+stc;
+        const rebuild = _=>fse.copy(srcdir, distdir);
+        return {srcdir, distdir, rebuild}; 
+    });
+
+    const pub = !isWeb ? {} : {
+        srcdir:demo.dir+ "/public",
+        distdir:demo.distdir+"/public",
+        rebuild:async () => {
+            await fse.copy(pub.srcdir, pub.distdir);
+            await Promise.all(injects.map(file=>injectFile(pub.distdir+"/"+file, demo.info)));
+        }
+    }
+
     const peersFile = (lib.dir ? lib.dir+"/" : "")+"peers.js";
-    return { port, lib, demo, peersFile, isWeb, mode, injects, rebuildBuffer, log:logger(name, version, env) }
+    return { port, lib, demo, pub, statics, peersFile, isWeb, mode, rebuildBuffer, log:logger(name, version, env) }
 }
