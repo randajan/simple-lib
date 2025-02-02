@@ -27,7 +27,7 @@ slib(
             minify:false,               //lib minify - true = generate minify build
             entries:["index.js"],       //lib entries files
             external:[],                //lib esbuild external libraries
-            statics:["static"],                 //lib statics files and folders
+            statics:["static"],         //lib statics files and folders
             plugins:[],                 //lib esbuild plugins
             loader:{},                  //lib exbuild loader
             info:{},                    //lib package info
@@ -38,6 +38,7 @@ slib(
                 fragment:undefined,     //lib es-build jsxFragment; if null then jsx.factory will be set
                 importSource:undefined  //lib es-build jsxImportSource
             },
+            standalone:"testLib"
         },                                        
         demo:{                          
             dir:"test/demo",            //demo root directory

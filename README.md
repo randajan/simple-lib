@@ -59,6 +59,14 @@ slib(
                 fragment:jsx.factory,   //lib es-build jsxFragment; if null then jsx.factory will be set
                 importSource:undefined  //lib es-build jsxImportSource
             },
+            standalone:{                //standalone build of library - if string is provided it will asume it's name
+                distdir:"standalone",   //standalone build directory
+                name:"globalName",      //standalone globalName - required
+                external:[],            //standalone external - default same as lib
+                plugins:[],             //standalone plugins - default same as lib
+                loader:{}               //standalone loader - default same as lib
+            }     
+
         },                                        
         demo:{                          
             dir:"demo",                 //demo root directory

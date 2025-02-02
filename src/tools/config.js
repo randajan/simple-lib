@@ -7,21 +7,23 @@ import fse from "fs-extra";
 import { injectFile } from "../tools/inject";
 
 import argv from "./argv";
+import path from "path";
 
 export const env = argv.env || process?.env?.NODE_ENV || "dev";
 export const root = approot.path;
 
-const { name, description, version, author } = fse.readJSONSync(root + "/package.json");
+const { name, description, version, author } = fse.readJSONSync(path.join(root, "package.json"));
 
 const _externalsPlugin = nodeExternalsPlugin({ allowList:["info", "lib", "node", "web"].map(v=>"@randajan/simple-lib/"+v)});
 const _modes = ["web", "node"];
 
-const buildFactory = ({entries, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
+const buildFactory = ({ globalName, entries, filename, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
     let _build; //cache esbuild
 
     return async _=>{
         if (_build) { await _build.rebuild(); return _build; }
         return _build = await build({
+            globalName,
             format,
             minify,
             color:true,
@@ -30,7 +32,8 @@ const buildFactory = ({entries, distdir, minify, splitting, external, plugins, l
             logLevel: 'error',
             incremental: true,
             entryPoints:entries,
-            outdir:distdir,
+            outfile:filename ? path.join(distdir, filename + (filename.endsWith(".js") ? "" : ".js")) : undefined,
+            outdir:filename ? undefined : distdir,
             define:{__slib_info:JSON.stringify(info)},
             splitting,
             external,
@@ -78,11 +81,9 @@ export const parseConfig = (isBuild, c={})=>{
     }
 
     for (const x of [lib, demo]) {
-        const dir = (x.dir ? x.dir + "/" : "");
-        
-        x.srcdir = dir + (x.srcdir || "src");
-        x.distdir = dir + (x.distdir || "dist");
-        x.entries = (x.entries || ["index.js"]).map(e=>x.srcdir+"/"+e);
+        x.srcdir = path.join(x.dir, x.srcdir || "src");
+        x.distdir = path.join(x.dir, x.distdir || "dist");
+        x.entries = (x.entries || ["index.js"]).map(e=>path.join(x.srcdir, e));
         x.minify = x.minify != null ? x.minify : minify;
         x.external = [...(x.external || []), ...external, ...builtinModules];
         x.loader = {...(x.loader || {}), ...loader};
@@ -91,22 +92,45 @@ export const parseConfig = (isBuild, c={})=>{
         x.rebuild = buildFactory(x);
     }
 
+    if (lib.standalone) {
+        const libRebuild = lib.rebuild;
+        const sa = typeof lib.standalone == "object" ? lib.standalone : {...lib, name:lib.standalone, distdir:""};
+        const { distdir, name, external, plugins, loader } = sa;
+        
+        const saRebuild = buildFactory({
+            globalName:name,
+            filename:name,
+            entries:[path.join(lib.srcdir, "index.js")],
+            distdir:path.join(lib.dir, distdir || "standalone"),
+            minify:false,
+            splitting:false,
+            external,
+            plugins,
+            loader,
+            format:"iife",
+            jsx:{},
+            info:lib.info
+        });
+        
+        lib.rebuild = _=>Promise.all([libRebuild(), saRebuild()]);
+    }
+
     const statics = !lib.statics ? [] : lib.statics.map(stc=>{
-        const srcdir = lib.srcdir+"/"+stc;
-        const distdir = lib.distdir+"/"+stc;
+        const srcdir = path.join(lib.srcdir, stc);
+        const distdir = path.join(lib.distdir, stc);
         const rebuild = _=>fse.copy(srcdir, distdir);
         return {srcdir, distdir, rebuild}; 
     });
 
     const pub = !isWeb ? null : {
-        srcdir:demo.dir+ "/public",
+        srcdir:path.join(demo.dir, "public"),
         distdir:demo.distdir,
         rebuild:async () => {
             await fse.copy(pub.srcdir, pub.distdir);
-            await Promise.all(injects.map(file=>injectFile(pub.distdir+"/"+file, demo.info)));
+            await Promise.all(injects.map(file=>injectFile(path.join(pub.distdir, file), demo.info)));
         }
     }
 
-    const peersFile = (lib.dir ? lib.dir+"/" : "")+"peers.js";
+    const peersFile = path.join(lib.dir, "peers.js");
     return { port, lib, demo, pub, statics, peersFile, isWeb, mode, rebuildBuffer, log:logger(name, version, env) }
 }

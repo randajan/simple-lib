@@ -6,6 +6,8 @@ import server from "live-server";
 import argv from "./tools/argv";
 import { parseConfig, root } from "./tools/config";
 import templates from "./tools/templates";
+import path from "path";
+
 
 
 export { root, argv }
@@ -18,9 +20,9 @@ export default async (isBuild, config = {}) => {
     const logred = logbold.red;
 
     if (!fs.existsSync(peersFile)) { await fs.outputFile(peersFile, templates.peers); }
-    if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(lib.srcdir + "/index.js", templates.lib); }
-    if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(demo.srcdir + "/index.js", isWeb ? templates.web : templates.node); }
-    if (pub && !fs.existsSync(pub.srcdir)) { await fs.outputFile(pub.srcdir + "/index.html", templates.html); }
+    if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(path.join(lib.srcdir, "index.js"), templates.lib); }
+    if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(path.join(demo.srcdir, "index.js"), isWeb ? templates.web : templates.node); }
+    if (pub && !fs.existsSync(pub.srcdir)) { await fs.outputFile(path.join(pub.srcdir, "index.html"), templates.html); }
     
     if (fs.existsSync(lib.distdir)) { await fs.remove(lib.distdir); }
     if (fs.existsSync(demo.distdir)) { await fs.remove(demo.distdir); }
