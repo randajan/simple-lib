@@ -100,7 +100,7 @@ export const parseConfig = (isBuild, c={})=>{
 
     const pub = !isWeb ? null : {
         srcdir:demo.dir+ "/public",
-        distdir:demo.distdir+"/public",
+        distdir:demo.distdir,
         rebuild:async () => {
             await fse.copy(pub.srcdir, pub.distdir);
             await Promise.all(injects.map(file=>injectFile(pub.distdir+"/"+file, demo.info)));
