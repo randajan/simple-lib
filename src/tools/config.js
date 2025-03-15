@@ -1,5 +1,4 @@
 import { builtinModules } from "module";
-import { build } from 'esbuild';
 import approot from "app-root-path";
 import { logger } from "./logger";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
@@ -8,6 +7,7 @@ import { injectFile } from "../tools/inject";
 
 import argv from "./argv";
 import path from "path";
+import { buildFactory } from "./buildFactory";
 
 export const env = argv.env || process?.env?.NODE_ENV || "dev";
 export const root = approot.path;
@@ -16,37 +16,6 @@ const { name, description, version, author } = fse.readJSONSync(path.join(root, 
 
 const _externalsPlugin = nodeExternalsPlugin({ allowList:["info", "lib", "node", "web"].map(v=>"@randajan/simple-lib/"+v)});
 const _modes = ["web", "node"];
-
-const buildFactory = ({ globalName, entries, filename, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
-    let _build; //cache esbuild
-
-    return async _=>{
-        if (_build) { await _build.rebuild(); return _build; }
-        return _build = await build({
-            globalName,
-            format,
-            minify,
-            color:true,
-            bundle: true,
-            sourcemap: true,
-            logLevel: 'error',
-            incremental: true,
-            entryPoints:entries,
-            outfile:filename ? path.join(distdir, filename + (filename.endsWith(".js") ? "" : ".js")) : undefined,
-            outdir:filename ? undefined : distdir,
-            define:{__slib_info:JSON.stringify(info)},
-            splitting,
-            external,
-            plugins,
-            loader,
-            jsx:jsx.transform,
-            jsxDev:jsx.dev,
-            jsxFactory:jsx.factory,
-            jsxFragment:jsx.fragment || jsx.factory,
-            jsxImportSource:jsx.importSource
-        });
-    }
-}
 
 export const parseConfig = (isBuild, c={})=>{
     const port = c.port || argv.port || 3000;
@@ -101,7 +70,7 @@ export const parseConfig = (isBuild, c={})=>{
             globalName:name,
             filename:name,
             entries:[path.join(lib.srcdir, "index.js")],
-            distdir:path.join(lib.dir, distdir || "standalone"),
+            distdir:path.join(lib.distdir, distdir || "standalone"),
             minify:false,
             splitting:false,
             external,
