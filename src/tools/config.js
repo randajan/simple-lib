@@ -52,7 +52,8 @@ export const parseConfig = (isBuild, c={})=>{
     for (const x of [lib, demo]) {
         x.srcdir = path.join(x.dir, x.srcdir || "src");
         x.distdir = path.join(x.dir, x.distdir || "dist");
-        x.entries = (x.entries || ["index.js"]).map(e=>path.join(x.srcdir, e));
+        x.entries = (x.entries || ["index.js"]);
+        x.entryPoints = x.entries.map(e=>path.join(x.srcdir, e));
         x.minify = x.minify != null ? x.minify : minify;
         x.external = [...(x.external || []), ...external, ...builtinModules];
         x.loader = {...(x.loader || {}), ...loader};

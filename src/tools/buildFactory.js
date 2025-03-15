@@ -1,37 +1,43 @@
-import { build } from 'esbuild';
+import esbuild from 'esbuild';
 import path from "path";
+import { renameEntries } from './renamer';
 
 
 
 
-const _buildFactory = ({ globalName, entries, filename, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
-    let _build; //cache esbuild
+const _buildFactory = ({ globalName, entries, exitPoints, entryPoints, filename, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
+    let context; //cache esbuild
 
     return async _=>{
-        if (_build) { await _build.rebuild(); return _build; }
-        return _build = await build({
-            globalName,
-            format,
-            minify,
-            color:true,
-            bundle: true,
-            sourcemap: true,
-            logLevel: 'error',
-            incremental: true,
-            entryPoints:entries,
-            outfile:filename ? path.join(distdir, filename + (filename.endsWith(".js") ? "" : ".js")) : undefined,
-            outdir:filename ? undefined : distdir,
-            define:{__slib_info:JSON.stringify(info)},
-            splitting,
-            external,
-            plugins,
-            loader,
-            jsx:jsx.transform,
-            jsxDev:jsx.dev,
-            jsxFactory:jsx.factory,
-            jsxFragment:jsx.fragment || jsx.factory,
-            jsxImportSource:jsx.importSource
-        });
+        if (!context) { 
+            context = await esbuild.context({
+                globalName,
+                format,
+                minify,
+                color:true,
+                bundle: true,
+                sourcemap: true,
+                logLevel: 'error',
+                entryPoints,
+                outfile:filename ? path.join(distdir, filename + (filename.endsWith(".js") ? "" : ".js")) : undefined,
+                outdir:filename ? undefined : distdir,
+                define:{__slib_info:JSON.stringify(info)},
+                splitting,
+                external,
+                plugins,
+                loader,
+                jsx:jsx.transform,
+                jsxDev:jsx.dev,
+                jsxFactory:jsx.factory,
+                jsxFragment:jsx.fragment || jsx.factory,
+                jsxImportSource:jsx.importSource
+            });
+        }
+
+        await context.rebuild();
+        if (format === "esm") { renameEntries(distdir, entries, ".mjs"); }
+        else if (format === "cjs") { renameEntries(distdir, entries, ".cjs" ); }
+        return context;
     }
 }
 
@@ -40,7 +46,11 @@ export const buildFactory = (config)=>{
 
     const { distdir } = config;
  
-    const esm = _buildFactory({...config, distdir:path.join(distdir, "esm")});
+    const esm = _buildFactory({
+        ...config,
+        distdir:path.join(distdir, "esm"),
+    });
+
     const cjs = _buildFactory({
         ...config,
         distdir:path.join(distdir, "cjs"),
