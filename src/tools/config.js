@@ -35,6 +35,7 @@ export const parseConfig = (isBuild, c={})=>{
     const lib = c.lib || {};
     const demo = c.demo || {};
 
+    lib.isLib = true;
     lib.dir = lib.dir || "";
     lib.format = "esm";
     lib.splitting = true;

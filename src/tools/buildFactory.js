@@ -5,7 +5,7 @@ import { renameEntries } from './renamer';
 
 
 
-const _buildFactory = ({ globalName, entries, exitPoints, entryPoints, filename, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
+const _buildFactory = ({ isLib, globalName, entries, entryPoints, filename, distdir, minify, splitting, external, plugins, loader, format, jsx, info })=>{
     let context; //cache esbuild
 
     return async _=>{
@@ -35,14 +35,15 @@ const _buildFactory = ({ globalName, entries, exitPoints, entryPoints, filename,
         }
 
         await context.rebuild();
-        if (format === "esm") { renameEntries(distdir, entries, ".mjs"); }
+        if (!isLib) {}
+        else if (format === "esm") { renameEntries(distdir, entries, ".mjs"); }
         else if (format === "cjs") { renameEntries(distdir, entries, ".cjs" ); }
         return context;
     }
 }
 
 export const buildFactory = (config)=>{
-    if (config.format !== "esm") { return _buildFactory(config); }
+    if (!config.isLib) { return _buildFactory(config); }
 
     const { distdir } = config;
  
