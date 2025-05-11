@@ -38,7 +38,12 @@ slib(
                 fragment:undefined,     //lib es-build jsxFragment; if null then jsx.factory will be set
                 importSource:undefined  //lib es-build jsxImportSource
             },
-            standalone:"testLib"
+            standalone:{
+                entries:{
+                    "testLib":"index.js",
+                    "just":"just.js"
+                }
+            }
         },                                        
         demo:{                          
             dir:"test/demo",            //demo root directory

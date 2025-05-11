@@ -65,25 +65,32 @@ export const parseConfig = (isBuild, c={})=>{
 
     if (lib.standalone) {
         const libRebuild = lib.rebuild;
-        const sa = typeof lib.standalone == "object" ? lib.standalone : {...lib, name:lib.standalone, distdir:""};
-        const { distdir, name, external, plugins, loader } = sa;
-        
-        const saRebuild = buildFactory({
-            globalName:name,
-            filename:name,
-            entries:[path.join(lib.srcdir, "index.js")],
+        const sa = typeof lib.standalone == "object" ? lib.standalone : {...lib, entries:{[lib.standalone]:"index.js"}, distdir:""};
+        const { distdir, entries, external, plugins, loader, jsx } = sa;
+
+        const temp = {
             distdir:path.join(lib.distdir, distdir || "standalone"),
             minify:false,
             splitting:false,
-            external,
-            plugins,
-            loader,
+            external: external || lib.external,
+            plugins: plugins || lib.plugins,
+            loader: loader || lib.loader,
             format:"iife",
-            jsx:{},
+            jsx: jsx || lib.jsx,
             info:lib.info
+        }
+
+        const saRebuilds = Object.entries(entries).map(([name, entry])=>{
+            return buildFactory({
+                globalName:name,
+                filename:name,
+                entries:[entry],
+                entryPoints:[path.join(lib.srcdir, entry)],
+                ...temp
+            });
         });
         
-        lib.rebuild = _=>Promise.all([libRebuild(), saRebuild()]);
+        lib.rebuild = _=>Promise.all([libRebuild(), ...saRebuilds.map(sarb=>sarb())]);
     }
 
     const statics = !lib.statics ? [] : lib.statics.map(stc=>{
