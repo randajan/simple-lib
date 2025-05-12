@@ -1,12 +1,18 @@
 import esbuild from 'esbuild';
 import path from "path";
 import { renameEntries } from './renamer';
+import { builtinModules } from 'module';
+import { nodeExternalsPlugin } from 'esbuild-node-externals';
 
+const _allowList = ["info", "lib", "node", "web"].map(v=>"@randajan/simple-lib/"+v);
 
-
+const extPlug = (plugins, bundle)=>{
+    if (!bundle) { return plugins; }
+    return [...plugins, nodeExternalsPlugin({ allowList:[...bundle, ..._allowList] })]
+}
 
 const _buildFactory = (opt={})=>{
-    const { isLib, globalName, entries, entryPoints, filename, distdir, minify, splitting, external, plugins, loader, format, jsx, info } = opt;
+    const { isLib, globalName, entries, entryPoints, filename, distdir, minify, splitting, plugins, bundle, loader, format, jsx, info } = opt;
     let context; //cache esbuild
 
     return async _=>{
@@ -24,8 +30,8 @@ const _buildFactory = (opt={})=>{
                 outdir:filename ? undefined : distdir,
                 define:{__slib_info:JSON.stringify(info)},
                 splitting,
-                external,
-                plugins,
+                external:builtinModules,
+                plugins:extPlug(plugins, bundle),
                 loader,
                 jsx:jsx.transform,
                 jsxDev:jsx.dev,

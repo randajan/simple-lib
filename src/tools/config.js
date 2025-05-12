@@ -1,7 +1,5 @@
-import { builtinModules } from "module";
 import approot from "app-root-path";
 import { logger } from "./logger";
-import { nodeExternalsPlugin } from "esbuild-node-externals";
 import fse from "fs-extra";
 import { injectFile } from "../tools/inject";
 
@@ -14,7 +12,6 @@ export const root = approot.path;
 
 const { name, description, version, author } = fse.readJSONSync(path.join(root, "package.json"));
 
-const _externalsPlugin = nodeExternalsPlugin({ allowList:["info", "lib", "node", "web"].map(v=>"@randajan/simple-lib/"+v)});
 const _modes = ["web", "node"];
 
 export const parseConfig = (isBuild, c={})=>{
@@ -24,7 +21,7 @@ export const parseConfig = (isBuild, c={})=>{
     const info = {...(c.info ? c.info : {}), isBuild, name, description, version, author, env, mode};
     const injects = c.injects || ["index.html"];
     const rebuildBuffer = Math.max(0, Number(c.rebuildBuffer) || 100);
-    const external = c.external || [];
+    const bundle = c.bundle || [];
     const plugins = c.plugins || [];
     const loader = c.loader || {};
     const jsx = c.jsx || {};
@@ -39,16 +36,9 @@ export const parseConfig = (isBuild, c={})=>{
     lib.dir = lib.dir || "";
     lib.format = "esm";
     lib.splitting = true;
-    lib.plugins = [...(lib.plugins || []), ...plugins, _externalsPlugin];
 
     demo.dir = demo.dir || "demo";
-    demo.format = "iife";
-    demo.plugins = [...(demo.plugins || []), ...plugins];
-
-    if (!isWeb) {
-        demo.format = "esm";
-        demo.plugins.push(_externalsPlugin);
-    }
+    demo.format = isWeb ? "iife" : "esm";
 
     for (const x of [lib, demo]) {
         x.srcdir = path.join(x.dir, x.srcdir || "src");
@@ -56,7 +46,8 @@ export const parseConfig = (isBuild, c={})=>{
         x.entries = (x.entries || ["index.js"]);
         x.entryPoints = x.entries.map(e=>path.join(x.srcdir, e));
         x.minify = x.minify != null ? x.minify : minify;
-        x.external = [...(x.external || []), ...external, ...builtinModules];
+        x.plugins = [...(x.plugins || []), ...plugins];
+        x.bundle = (x.isLib || !isWeb) ? [...(x.bundle || []), ...bundle] : undefined;
         x.loader = {...(x.loader || {}), ...loader};
         x.jsx = x.jsx ? {...jsx, ...x.jsx} : jsx;
         x.info = { ...(x.info || {}), ...argv, ...info, port, mode, dir:{ root, dist:x.distdir }}
@@ -66,14 +57,14 @@ export const parseConfig = (isBuild, c={})=>{
     if (lib.standalone) {
         const libRebuild = lib.rebuild;
         const sa = typeof lib.standalone == "object" ? lib.standalone : {...lib, entries:{[lib.standalone]:"index.js"}, distdir:""};
-        const { distdir, entries, external, plugins, loader, jsx } = sa;
+        const { distdir, entries, bundle, plugins, loader, jsx } = sa;
 
         const temp = {
             distdir:path.join(lib.distdir, distdir || "standalone"),
             minify:false,
             splitting:false,
-            external: external || lib.external,
             plugins: plugins || lib.plugins,
+            bundle:bundle || lib.bundle,
             loader: loader || lib.loader,
             format:"iife",
             jsx: jsx || lib.jsx,

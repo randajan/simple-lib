@@ -31,7 +31,7 @@ slib(
         mode:"web",                     //"web"=frontend lib, "node"=backend lib
         rebuildBuffer:100,              //delay between src changed and rebuild happens
         minify:false,                   //global minify - true = generate minify build
-        external:[],                    //global esbuild external libraries
+        bundle:[],                      //global include libs in the bundle
         plugins:[],                     //global esbuild plugins
         loader:{},                      //global esbuild loader
         info:{},                        //global package info
@@ -48,7 +48,7 @@ slib(
             distdir:"dist",             //lib build directory
             minify:false,               //lib minify - true = generate minify build
             entries:["index.js"],       //lib entries files
-            external:[],                //lib esbuild external libraries
+            bundle:[],                  //lib esbuild include libs in the bundle
             plugins:[],                 //lib esbuild plugins
             loader:{},                  //lib exbuild loader
             info:{},                    //lib package info
@@ -62,7 +62,7 @@ slib(
             standalone:{                //standalone build of library
                 distdir:"standalone",   //standalone build directory
                 entries:{},             //standalone named entries - required!
-                external:[],            //standalone external - default same as lib
+                bundle:[],              //standalone include libs in the bundle - default same as lib
                 plugins:[],             //standalone plugins - default same as lib
                 loader:{}               //standalone loader - default same as lib
                 jsx:{}                  //standalone jsx - default same as lib
@@ -75,7 +75,7 @@ slib(
             distdir:"dist",             //demo build directory
             minify:false,               //demo minify - true = generate minify build
             entries:["index.js"],       //demo entries files
-            external:[],                //demo esbuild external libraries
+            bundle:[],                  //demo esbuild include libs in the bundle
             plugins:[],                 //demo esbuild plugins
             loader:{},                  //demo esbuild loader
             info:{},                    //demo package info
