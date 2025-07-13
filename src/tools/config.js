@@ -36,7 +36,7 @@ export const parseConfig = (isBuild, c={})=>{
     lib.dir = lib.dir || "";
     lib.format = "esm";
     lib.splitting = true;
-
+    
     demo.dir = demo.dir || "demo";
     demo.format = isWeb ? "iife" : "esm";
 
@@ -46,6 +46,7 @@ export const parseConfig = (isBuild, c={})=>{
         x.entries = (x.entries || ["index.js"]);
         x.entryPoints = x.entries.map(e=>path.join(x.srcdir, e));
         x.minify = x.minify != null ? x.minify : minify;
+        x.legalComments = (x.legalComments || c.legalComments || (x.minify ? "eof" : "inline"));
         x.plugins = [...(x.plugins || []), ...plugins];
         x.bundle = (x.isLib || !isWeb) ? [...(x.bundle || []), ...bundle] : undefined;
         x.loader = {...(x.loader || {}), ...loader};

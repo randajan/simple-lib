@@ -31,6 +31,7 @@ slib(
         mode:"web",                     //"web"=frontend lib, "node"=backend lib
         rebuildBuffer:100,              //delay between src changed and rebuild happens
         minify:false,                   //global minify - true = generate minify build
+        legalComments: 'inline',        //global esbuild legalComments
         bundle:[],                      //global include libs in the bundle
         plugins:[],                     //global esbuild plugins
         loader:{},                      //global esbuild loader
@@ -47,6 +48,7 @@ slib(
             srcdir:"src",               //lib source code directory
             distdir:"dist",             //lib build directory
             minify:false,               //lib minify - true = generate minify build
+            legalComments: 'inline',    //lib esbuild legalComments
             entries:["index.js"],       //lib entries files
             bundle:[],                  //lib esbuild include libs in the bundle
             plugins:[],                 //lib esbuild plugins
@@ -74,6 +76,7 @@ slib(
             srcdir:"src",               //demo source code directory
             distdir:"dist",             //demo build directory
             minify:false,               //demo minify - true = generate minify build
+            legalComments: 'inline',    //demo esbuild legalComments
             entries:["index.js"],       //demo entries files
             bundle:[],                  //demo esbuild include libs in the bundle
             plugins:[],                 //demo esbuild plugins

@@ -9,6 +9,7 @@ slib(
         mode:"web",                     //"web"=frontend lib, "node"=backend lib
         rebuildBuffer:500,              //delay between src changed and rebuild happens
         minify:false,                   //global minify - true = generate minify build
+        legalComments:"linked",
         external:[],                    //global esbuild external libraries
         plugins:[],                     //global esbuild plugins
         loader:{},                      //global esbuild loader

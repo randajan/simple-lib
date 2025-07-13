@@ -12,7 +12,7 @@ const extPlug = (plugins, bundle)=>{
 }
 
 const _buildFactory = (opt={})=>{
-    const { isLib, globalName, entries, entryPoints, filename, distdir, minify, splitting, plugins, bundle, loader, format, jsx, info } = opt;
+    const { isLib, globalName, entries, entryPoints, filename, distdir, minify, legalComments, splitting, plugins, bundle, loader, format, jsx, info } = opt;
     let context; //cache esbuild
 
     return async _=>{
@@ -21,6 +21,7 @@ const _buildFactory = (opt={})=>{
                 globalName,
                 format,
                 minify,
+                legalComments,
                 color:true,
                 bundle: true,
                 sourcemap: true,
