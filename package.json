@@ -1,6 +1,6 @@
 {
   "name": "@randajan/simple-lib",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Supersimple start for developing custom js library",
   "repository": "randajan/simple-lib",
   "type": "module",
