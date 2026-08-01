@@ -102,8 +102,8 @@ slib(
     "app-root-path": "^3.1.0",
     "chalk": "^5.2.0",
     "chokidar": "^3.6.0",
-    "esbuild": "0.16.17",
-    "esbuild-node-externals": "^1.13.0",
+    "esbuild": "^0.28.1",
+    "esbuild-node-externals": "^1.23.1",
     "fs-extra": "^11.2.0",
     "live-server": "^1.2.2"
 ...

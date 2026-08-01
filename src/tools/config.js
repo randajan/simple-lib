@@ -58,11 +58,12 @@ export const parseConfig = (isBuild, c={})=>{
     if (lib.standalone) {
         const libRebuild = lib.rebuild;
         const sa = typeof lib.standalone == "object" ? lib.standalone : {...lib, entries:{[lib.standalone]:"index.js"}, distdir:""};
-        const { distdir, entries, bundle, plugins, loader, jsx } = sa;
+        const { distdir, entries, bundle, plugins, loader, jsx, legalComments } = sa;
 
         const temp = {
             distdir:path.join(lib.distdir, distdir || "standalone"),
             minify:false,
+            legalComments:legalComments || lib.legalComments,
             splitting:false,
             plugins: plugins || lib.plugins,
             bundle:bundle || lib.bundle,

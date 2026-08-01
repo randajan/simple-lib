@@ -20,6 +20,7 @@ await build({
         "src/web/index.js",
         "src/info/index.js",
     ],
+    legalComments:"inline",
     plugins:[nodeExternalsPlugin()],
     external:builtinModules,
 });
