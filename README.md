@@ -36,6 +36,7 @@ slib(
         plugins:[],                     //global esbuild plugins
         loader:{},                      //global esbuild loader
         info:{},                        //global package info
+        ts:undefined,                   //global TypeScript config; use ts() from "@randajan/simple-lib/ts"
         jsx:{                           //global jsx config
             transform:undefined,        //global es-build jsx
             dev:undefined,              //global es-build jsxDev
@@ -94,6 +95,36 @@ slib(
 )
 
 ```
+
+## TypeScript libraries
+
+Install TypeScript in the library project:
+
+```console
+npm install -D typescript
+```
+
+or
+
+```console
+yarn add -D typescript
+```
+
+Use the optional helper next to `slib`:
+
+```javascript
+import slib from "@randajan/simple-lib";
+import ts from "@randajan/simple-lib/ts";
+
+slib(true, {
+    ts:ts(),
+    lib:{
+        dir:""
+    }
+});
+```
+
+When `ts` is provided, default entries are `index.ts`. On production build only (`isBuild=true`), the helper runs the local `node_modules/typescript/bin/tsc` for the library root, so `tsconfig.json` is expected next to that library's `package.json` / source root. Declarations are emitted to `dist/types` by default while esbuild creates the bundled JS outputs.
 
 ## Requirements
 

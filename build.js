@@ -15,10 +15,11 @@ await build({
     entryPoints: [
         "src/index.js",
         "src/peers.js",
+        "src/ts/index.js",
         "src/lib/index.js",
         "src/node/index.js",
         "src/web/index.js",
-        "src/info/index.js",
+        "src/info/index.js"
     ],
     legalComments:"inline",
     plugins:[nodeExternalsPlugin()],

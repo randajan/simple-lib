@@ -1,9 +1,10 @@
 import slib, { argv } from "./dist/index.js";
+import ts from "./dist/ts/index.js";
 import fs from "fs-extra";
 
 
 slib(
-    false,                              //true = generate build; false = start dev server;
+    argv.isBuild,                              //true = generate build; false = start dev server;
     {
         port:3000,                      //port of dev server
         mode:"web",                     //"web"=frontend lib, "node"=backend lib
@@ -21,12 +22,13 @@ slib(
             fragment:undefined,         //global es-build jsxFragment; if null then jsx.factory will be set
             importSource:undefined      //global es-build jsxImportSource
         },
+        ts:ts(),
         lib:{
             dir:"test",                 //lib root directory
             srcdir:"src",               //lib source code directory
             distdir:"dist",             //lib build directory
             minify:false,               //lib minify - true = generate minify build
-            entries:["index.js"],       //lib entries files
+            entries:["index.ts"],       //lib entries files
             external:[],                //lib esbuild external libraries
             statics:["static"],         //lib statics files and folders
             plugins:[],                 //lib esbuild plugins
@@ -41,8 +43,8 @@ slib(
             },
             standalone:{
                 entries:{
-                    "testLib":"index.js",
-                    "just":"just.js"
+                    "testLib":"index.ts",
+                    "just":"just.ts"
                 }
             }
         },                                        
@@ -51,7 +53,7 @@ slib(
             srcdir:"src",               //demo source code directory
             distdir:"dist",             //demo build directory
             minify:false,               //demo minify - true = generate minify build
-            entries:["index.js"],       //demo entries files
+            entries:["index.ts"],       //demo entries files
             external:[],                //demo esbuild external libraries
             plugins:[],                 //demo esbuild plugins
             loader:{},                  //demo esbuild loader

@@ -25,6 +25,7 @@ export const parseConfig = (isBuild, c={})=>{
     const plugins = c.plugins || [];
     const loader = c.loader || {};
     const jsx = c.jsx || {};
+    const ts = c.ts;
 
     if (!_modes.includes(mode)) { throw Error(`mode should be one of '${_modes.join("', '")}' but '${mode}' provided`); }
     const isWeb = mode === "web";
@@ -43,7 +44,8 @@ export const parseConfig = (isBuild, c={})=>{
     for (const x of [lib, demo]) {
         x.srcdir = path.join(x.dir, x.srcdir || "src");
         x.distdir = path.join(x.dir, x.distdir || "dist");
-        x.entries = (x.entries || ["index.js"]);
+        x.ts = x.ts ? {...(ts || {}), ...x.ts} : ts;
+        x.entries = (x.entries || ["index." + (x.ts ? "ts" : "js")]);
         x.entryPoints = x.entries.map(e=>path.join(x.srcdir, e));
         x.minify = x.minify != null ? x.minify : minify;
         x.legalComments = (x.legalComments || c.legalComments || (x.minify ? "eof" : "inline"));
@@ -57,8 +59,8 @@ export const parseConfig = (isBuild, c={})=>{
 
     if (lib.standalone) {
         const libRebuild = lib.rebuild;
-        const sa = typeof lib.standalone == "object" ? lib.standalone : {...lib, entries:{[lib.standalone]:"index.js"}, distdir:""};
-        const { distdir, entries, bundle, plugins, loader, jsx, legalComments } = sa;
+        const sa = typeof lib.standalone == "object" ? lib.standalone : {...lib, entries:{[lib.standalone]:"index." + (lib.ts ? "ts" : "js")}, distdir:""};
+        const { distdir, entries, bundle, plugins, loader, jsx, legalComments, ts } = sa;
 
         const temp = {
             distdir:path.join(lib.distdir, distdir || "standalone"),
@@ -70,6 +72,7 @@ export const parseConfig = (isBuild, c={})=>{
             loader: loader || lib.loader,
             format:"iife",
             jsx: jsx || lib.jsx,
+            ts:ts || lib.ts,
             info:lib.info
         }
 

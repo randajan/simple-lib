@@ -20,8 +20,8 @@ export default async (isBuild, config = {}) => {
     const logred = logbold.red;
 
     if (!fs.existsSync(peersFile)) { await fs.outputFile(peersFile, templates.peers); }
-    if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(path.join(lib.srcdir, "index.js"), templates.lib); }
-    if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(path.join(demo.srcdir, "index.js"), isWeb ? templates.web : templates.node); }
+    if (!fs.existsSync(lib.srcdir)) { await fs.outputFile(path.join(lib.srcdir, lib.entries[0]), templates.lib); }
+    if (!fs.existsSync(demo.srcdir)) { await fs.outputFile(path.join(demo.srcdir, demo.entries[0]), isWeb ? templates.web : templates.node); }
     if (pub && !fs.existsSync(pub.srcdir)) { await fs.outputFile(path.join(pub.srcdir, "index.html"), templates.html); }
     
     if (fs.existsSync(lib.distdir)) { await fs.remove(lib.distdir); }
@@ -29,6 +29,10 @@ export default async (isBuild, config = {}) => {
 
     await pub?.rebuild();
     await Promise.all(statics.map(s=>s.rebuild()));
+    if (isBuild && lib.ts) {
+        if (typeof lib.ts.build !== "function") { throw Error("TypeScript build requires ts.build. Use @randajan/simple-lib/ts or provide ts.build."); }
+        await lib.ts.build(lib);
+    }
     await lib.rebuild();
     await demo.rebuild();
     

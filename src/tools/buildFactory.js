@@ -1,6 +1,5 @@
 import esbuild from 'esbuild';
 import path from "path";
-import { renameEntries } from './renamer';
 import { builtinModules } from 'module';
 import { nodeExternalsPlugin } from 'esbuild-node-externals';
 
@@ -10,9 +9,10 @@ const extPlug = (plugins, bundle)=>{
     if (!bundle) { return plugins; }
     return [...plugins, nodeExternalsPlugin({ allowList:[...bundle, ..._allowList] })]
 }
+const outExt = format=>format === "esm" ? { ".js": ".mjs" } : (format === "cjs" ? { ".js": ".cjs" } : undefined);
 
 const _buildFactory = (opt={})=>{
-    const { isLib, globalName, entries, entryPoints, filename, distdir, minify, legalComments, splitting, plugins, bundle, loader, format, jsx, info } = opt;
+    const { isLib, globalName, entryPoints, filename, distdir, minify, legalComments, splitting, plugins, bundle, loader, format, jsx, info } = opt;
     let context; //cache esbuild
 
     return async _=>{
@@ -29,6 +29,7 @@ const _buildFactory = (opt={})=>{
                 entryPoints,
                 outfile:filename ? path.join(distdir, filename + (filename.endsWith(".js") ? "" : ".js")) : undefined,
                 outdir:filename ? undefined : distdir,
+                outExtension:isLib ? outExt(format) : undefined,
                 define:{__slib_info:JSON.stringify(info)},
                 splitting,
                 external:builtinModules,
@@ -43,10 +44,7 @@ const _buildFactory = (opt={})=>{
         }
 
         await context.rebuild();
-        if (!isLib) { return }
-        else if (format === "esm") { renameEntries(distdir, entries, ".mjs"); }
-        else if (format === "cjs") { renameEntries(distdir, entries, ".cjs" ); }
-        return context;
+        if (isLib) { return context; }
     }
 }
 

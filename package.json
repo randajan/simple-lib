@@ -1,6 +1,6 @@
 {
   "name": "@randajan/simple-lib",
-  "version": "3.4.0",
+  "version": "4.0.0",
   "description": "Supersimple start for developing custom js library",
   "repository": "randajan/simple-lib",
   "type": "module",
@@ -9,6 +9,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./peers": "./dist/peers.js",
+    "./ts": "./dist/ts/index.js",
     "./lib": "./dist/lib/index.js",
     "./web": "./dist/web/index.js",
     "./node": "./dist/node/index.js",
@@ -50,5 +51,8 @@
     "name": "Jan Randa",
     "email": "jnranda@gmail.com",
     "url": "https://www.linkedin.com/in/randajan/"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
   }
 }
