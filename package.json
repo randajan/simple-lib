@@ -1,6 +1,6 @@
 {
   "name": "@randajan/simple-lib",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Supersimple start for developing custom js library",
   "repository": "randajan/simple-lib",
   "type": "module",
@@ -9,7 +9,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./peers": "./dist/peers.js",
-    "./fs":"./dist/fs/index.js",
+    "./fs": "./dist/fs/index.js",
     "./ts": "./dist/ts/index.js",
     "./lib": "./dist/lib/index.js",
     "./web": "./dist/web/index.js",
