@@ -15,6 +15,7 @@ await build({
     entryPoints: [
         "src/index.js",
         "src/peers.js",
+        "src/fs/index.js",
         "src/ts/index.js",
         "src/lib/index.js",
         "src/node/index.js",

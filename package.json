@@ -9,6 +9,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./peers": "./dist/peers.js",
+    "./fs":"./dist/fs/index.js",
     "./ts": "./dist/ts/index.js",
     "./lib": "./dist/lib/index.js",
     "./web": "./dist/web/index.js",
