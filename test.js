@@ -7,7 +7,7 @@ slib(
     argv.isBuild,                              //true = generate build; false = start dev server;
     {
         port:3000,                      //port of dev server
-        mode:"web",                     //"web"=frontend lib, "node"=backend lib
+        mode:"node",                     //"web"=frontend lib, "node"=backend lib
         rebuildBuffer:500,              //delay between src changed and rebuild happens
         minify:false,                   //global minify - true = generate minify build
         legalComments:"linked",

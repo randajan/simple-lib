@@ -24,13 +24,13 @@ import { info, log } from "@randajan/simple-lib/lib";
 export default _=>log.bold.magenta("helloworld", JSON.stringify(info, null, 2));
 `,
   node:`
-import { info, log } from "@randajan/simple-lib/node";
+import "@randajan/simple-lib/node";
 import dist from "../../dist/esm/index.mjs";
 
 dist();
 `,
   web:`
-import { info, log } from "@randajan/simple-lib/web";
+import "@randajan/simple-lib/web";
 import dist from "../../dist/esm/index.mjs";
 
 dist();

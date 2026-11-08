@@ -15,7 +15,7 @@ export { root, argv }
 export default async (isBuild, config = {}) => {
     isBuild = typeof isBuild === "boolean" ? isBuild : (argv.isBuild || false);
 
-    const { port, isWeb, mode, lib, demo, pub, statics, peersFile, rebuildBuffer, log } = parseConfig(isBuild, config);
+    const { port, isWeb, lib, demo, pub, statics, peersFile, rebuildBuffer, log } = parseConfig(isBuild, config);
     const logbold = log.bold;
     const logred = logbold.red;
 
@@ -66,7 +66,7 @@ export default async (isBuild, config = {}) => {
     }
 
     const libIgnore = statics.map(({srcdir, rebuild})=>{
-        rebootOn("Static", logbold.cyan, srcdir, async _=>{ await rebuild(); rebuildDemo(); });
+        rebootOn("Static", logbold.cyan, srcdir, async _=>{ await rebuild(); await rebuildDemo(); });
         return srcdir;
     });
 
@@ -78,7 +78,7 @@ export default async (isBuild, config = {}) => {
     rebootOn("Demo", logbold.green, demo.srcdir, rebuildDemo, [pub?.srcdir]);
 
     if (isWeb) {
-        rebootOn("Public", logbold.magenta, pub.srcdir, async _=>{ await pub.rebuild(); rebuildDemo(); });
+        rebootOn("Public", logbold.magenta, pub.srcdir, async _=>{ await pub.rebuild(); await rebuildDemo(); });
         return server.start({
             port,
             root: demo.distdir,

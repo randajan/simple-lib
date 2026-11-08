@@ -12,7 +12,7 @@ const extPlug = (plugins, bundle)=>{
 const outExt = format=>format === "esm" ? { ".js": ".mjs" } : (format === "cjs" ? { ".js": ".cjs" } : undefined);
 
 const _buildFactory = (opt={})=>{
-    const { isLib, globalName, entryPoints, filename, distdir, minify, legalComments, splitting, plugins, bundle, loader, format, jsx, info } = opt;
+    const { isLib, mode, globalName, entryPoints, filename, distdir, minify, legalComments, splitting, plugins, bundle, loader, format, jsx, info } = opt;
     let context; //cache esbuild
 
     return async _=>{
@@ -20,6 +20,7 @@ const _buildFactory = (opt={})=>{
             context = await esbuild.context({
                 globalName,
                 format,
+                platform: info.mode === "node" ? "node" : "browser",
                 minify,
                 legalComments,
                 color:true,
